@@ -40,7 +40,7 @@ class LoginController extends GetxController{
         Get.snackbar('Error', 'Ocurrió un error al iniciar sesión.');
       }
     }else{
-      Get.snackbar('Error', 'Sin conexión a internet');
+      Get.snackbar('Error', 'Sin conexión a internet.');
     }
 
     isLoading.value = false;

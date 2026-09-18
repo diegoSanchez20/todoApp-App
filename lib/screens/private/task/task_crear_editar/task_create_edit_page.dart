@@ -12,6 +12,9 @@ class TaskCreateEditPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    con.initData();
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Task'),
@@ -41,7 +44,7 @@ class TaskCreateEditPage extends StatelessWidget {
                           },
                         ),
                        CustomText(
-                          controller: con.titleController,
+                          controller: con.decriptionController,
                           hintText: 'Ingrese la descripción',
                           label: 'Descripción',
                           validator: (value) {
