@@ -18,31 +18,36 @@ class LoginController extends GetxController{
 
   Future<void> iniciarSesion() async {
     if (!isValidForm() || isLoading.value) return;
-    
-    isLoading.value = true;
+    try {
+      
+      isLoading.value = true;
 
-    if(internetService.isConnected.value){
-      LoginResponse? response = await authService.login(
-        emailController.text, 
-        passwordController.text, 
-      );
+      if(internetService.isConnected.value){
+        LoginResponse? response = await authService.login(
+          emailController.text, 
+          passwordController.text, 
+        );
 
-      if(response != null){
-        final storage = GetStorage();
-        
-        await storage.write('user', {
-          'token': response.data.accessToken,
-          'tokenType': response.data.tokenType,
-        });
+        if(response != null){
+          final storage = GetStorage();
+          
+          await storage.write('user', {
+            'token': response.data.accessToken,
+            'tokenType': response.data.tokenType,
+          });
 
-        Get.offNamedUntil('/task-list',(route) => false);
+          Get.offNamedUntil('/task-list',(route) => false);
+        }else{
+          Get.snackbar('Error', 'Ocurrió un error al iniciar sesión.');
+        }
       }else{
-        Get.snackbar('Error', 'Ocurrió un error al iniciar sesión.');
+        Get.snackbar('Error', 'Sin conexión a internet.');
       }
-    }else{
-      Get.snackbar('Error', 'Sin conexión a internet.');
-    }
 
-    isLoading.value = false;
+      isLoading.value = false;
+    } catch (e) {
+      Get.snackbar('Error', e.toString().replaceFirst('Exception: ', ''),); 
+      isLoading.value = false;
+    }
   }
 }

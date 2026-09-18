@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:todo_app/env/env.dart';
 import 'package:todo_app/interceptors/interceptor_http.dart';
+import 'package:todo_app/models/error-response.dart';
 import 'package:todo_app/models/response/cerrar_sesion_response.dart';
 import 'package:todo_app/models/response/login_response.dart';
 import 'package:todo_app/models/response/register_response.dart';
@@ -14,11 +15,11 @@ class AuthService{
   final InterceptorHttp _client = InterceptorHttp();
 
 
-  Future<LoginResponse?> login(String email, String password)async{
-    
-    String body = jsonEncode({
-      'email': email, 
-      'password': password, 
+  Future<LoginResponse?> login(String email,String password) async {
+
+    final body = jsonEncode({
+      'email': email,
+      'password': password,
     });
 
     final headers = {
@@ -26,16 +27,25 @@ class AuthService{
       'Content-Type': 'application/json',
     };
 
-    Uri url = Uri.parse('$_url/login');
+    final Uri url = Uri.parse('$_url/login');
 
-    final response = await http.post(url, headers: headers, body: body);
+    final response = await http.post(
+      url,
+      headers: headers,
+      body: body,
+    );
 
-    if(response.statusCode == 200 || response.statusCode == 201){
+    if (response.statusCode == 200 || response.statusCode == 201) {
       final responseData = jsonDecode(response.body);
+
       return LoginResponse.fromJson(responseData);
-    }else{
-      return null;
     }
+
+    final responseError = jsonDecode(response.body);
+
+    final error = ErrorResponse.fromJson(responseError);
+
+    throw Exception(error.message);
   }
 
   Future<RegisterResponse?> register(String email, String password, String name)async{
