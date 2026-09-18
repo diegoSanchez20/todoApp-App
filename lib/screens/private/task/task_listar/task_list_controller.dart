@@ -47,16 +47,63 @@ class TaskListarController extends GetxController{
     listTarea.value = [];
   }
 
-  void cambiarPagina(int? number) {
+  void cambiarPagina(int? number)async {
     if (number == null) return;
 
     if (isLoading.value) return;
+
+    if (await tienePendientesMigrar()) {
+      Get.snackbar(
+        'Migración pendiente',
+        'Debe migrar las tareas pendientes.',
+      );
+
+      await Get.toNamed('/task-migrate');
+
+      // IMPORTANTE:
+      // No cambiar pageNumber.
+      // No ejecutar getAll().
+      return;
+    }
+
 
     pageNumber.value = number;
     getAll();
   }
 
+  Future<bool> tienePendientesMigrar() async {
+    if (!internetService.isConnected.value) {
+      return false;
+    }
+
+    final response = await TaskOperations.getAllPendientesMigrar(
+      page: 1,
+      pageSize: 1,
+    );
+
+    return response.data.isNotEmpty;
+  }
+
   Future<void> refreshData() async {
+    if (isLoading.value) return;
+
+    if (internetService.isConnected.value) {
+      final responseMigrate =await TaskOperations.getAllPendientesMigrar(
+        page: 1,
+        pageSize: 1,
+      );
+
+      if (responseMigrate.data.isNotEmpty) {
+        Get.snackbar(
+          'Migración pendiente',
+          'Debe migrar las tareas pendientes antes de actualizar.',
+        );
+
+        await Get.toNamed('/task-migrate');
+
+        return;
+      }
+    }
 
     pageNumber.value = 1;
 
@@ -69,6 +116,7 @@ class TaskListarController extends GetxController{
 
     try {
       if(internetService.isConnected.value){
+        
         // Con conexión a internet
         TareaListResponse? response = await taskService.getAll(pageSize.value, pageNumber.value);
         if(response != null){
@@ -92,6 +140,24 @@ class TaskListarController extends GetxController{
   }
 
   Future<void> registrarTarea()async{
+    if (internetService.isConnected.value) {
+      final responseMigrate =await TaskOperations.getAllPendientesMigrar(
+        page: 1,
+        pageSize: 1,
+      );
+
+      if (responseMigrate.data.isNotEmpty) {
+        Get.snackbar(
+          'Migración pendiente',
+          'Debe migrar las tareas pendientes antes de actualizar.',
+        );
+
+        await Get.toNamed('/task-migrate');
+
+        return;
+      }
+    }
+
     final rpta = await Get.toNamed('/task-crear-editar');
   
     if(rpta != null){
@@ -100,7 +166,35 @@ class TaskListarController extends GetxController{
     }
   }
 
+  Future<void> migrarTareas()async{
+    final rpta = await Get.toNamed('/task-migrate');
+  
+    if(rpta != null){
+      // clean();
+      // getAll();
+    }
+  }
+
   Future<void> editarTarea(DataTareaList item)async{
+
+    if (internetService.isConnected.value) {
+      final responseMigrate =await TaskOperations.getAllPendientesMigrar(
+        page: 1,
+        pageSize: 1,
+      );
+
+      if (responseMigrate.data.isNotEmpty) {
+        Get.snackbar(
+          'Migración pendiente',
+          'Debe migrar las tareas pendientes antes de actualizar.',
+        );
+
+        await Get.toNamed('/task-migrate');
+
+        return;
+      }
+    }
+
     final rpta = await Get.toNamed(
       '/task-crear-editar',
       arguments: {
@@ -115,6 +209,24 @@ class TaskListarController extends GetxController{
   }
 
   void cambiarEstadoTareaCompletado(int index, int id) async{
+
+    if (internetService.isConnected.value) {
+      final responseMigrate =await TaskOperations.getAllPendientesMigrar(
+        page: 1,
+        pageSize: 1,
+      );
+
+      if (responseMigrate.data.isNotEmpty) {
+        Get.snackbar(
+          'Migración pendiente',
+          'Debe migrar las tareas pendientes antes de actualizar.',
+        );
+
+        await Get.toNamed('/task-migrate');
+
+        return;
+      }
+    }
 
     if ( isLoading.value) return;
     isLoading.value = true;

@@ -24,7 +24,7 @@ class _TaskListPageState extends State<TaskListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Task Listado'),
+        title: const Text('Listar Tareas'),
         actions: [
           IconButton(
             icon: const Icon(Icons.logout_rounded),
@@ -45,9 +45,18 @@ class _TaskListPageState extends State<TaskListPage> {
                     const NotInternetBanner(),
                     Align(
                       alignment: AlignmentGeometry.centerLeft,
-                      child: GestureDetector(
-                        onTap: () => con.registrarTarea(),
-                        child: const Text('Nuevo'),
+                      child: Row(
+                        children: [
+                          ElevatedButton(
+                            onPressed: () => con.registrarTarea(),
+                            child: const Text('Nuevo'),
+                          ),
+                          SizedBox(width: 5),
+                          ElevatedButton(
+                            onPressed: () => con.migrarTareas(),
+                            child: const Text('Migrar Tareas Ofline'),
+                          ),
+                        ],
                       ),
                     ),
                     const SizedBox(height: 10),

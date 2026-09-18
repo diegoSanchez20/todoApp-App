@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:todo_app/database/operations/task_operations.dart';
 import 'package:todo_app/models/request/tarea_create_request.dart';
 import 'package:todo_app/models/request/tarea_update_request.dart';
 import 'package:todo_app/models/response/tarea_create_response.dart';
@@ -44,7 +45,7 @@ class TaskCreateEditController extends GetxController{
 
     if(tarea == null){
       if(internetService.isConnected.value){
-
+        // Con conexión a internet
         TareaCreateRequest params = TareaCreateRequest(
           title: titleController.text.trim(), 
           description: decriptionController.text.trim()
@@ -58,11 +59,29 @@ class TaskCreateEditController extends GetxController{
         }
 
       }else{
-        Get.snackbar('Error', 'Sin conexión a internet.');
+        // Sin conexion a internet
+        final id = await TaskOperations.createOffline(
+          title: titleController.text.trim(),
+          description: decriptionController.text.trim(),
+        );
+
+        if (id != null) {
+          Get.back(result: true);
+
+          Get.snackbar(
+            'Correcto',
+            'Tarea guardada correctamente.',
+          );
+        } else {
+          Get.snackbar(
+            'Error',
+            'No se pudo guardar la tarea.',
+          );
+        }
       }
     }else{
       if(internetService.isConnected.value){
-
+        //Con conexion a internet
         TareaUpdateRequest params = TareaUpdateRequest(
           completed: tarea!.completed,
           title: titleController.text.trim(), 
@@ -73,12 +92,32 @@ class TaskCreateEditController extends GetxController{
 
         if(response != null){
           Get.back(result: true);
-          Get.snackbar('Correcto', 'Tarea actualizar correctamente.');
+          Get.snackbar('Correcto', 'Tarea actualizada correctamente.');
         }else{
-          Get.snackbar('Error', 'Ocurrió un error al actualizar la tarea.');
+          Get.snackbar('Error', 'Ocurrió un error al crear la tarea.');
         }
       }else{
-        Get.snackbar('Error', 'Sin conexión a internet.');
+        // Sin conexión a internet
+        final success = await TaskOperations.updateOffline(
+          id: tarea!.id,
+          title: titleController.text.trim(),
+          description: decriptionController.text.trim(),
+          completed: tarea!.completed,
+        );
+
+        if (success) {
+          Get.back(result: true);
+
+          Get.snackbar(
+            'Correcto',
+            'Tarea actualizada correctamente.',
+          );
+        } else {
+          Get.snackbar(
+            'Error',
+            'Ocurrió un error al actualizar la tarea.',
+          );
+        }
       }
     }
 
