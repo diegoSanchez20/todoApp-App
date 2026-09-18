@@ -82,6 +82,10 @@ class RegisterPage extends StatelessWidget {
                           onPressed: () => !con.isLoading.value 
                             ? con.registrar()
                             : null,
+                        ),
+                        GestureDetector(
+                          onTap: () => Get.toNamed('login'),
+                          child: Text('¿Ya tienes una cuenta? Haz clic aquí'),
                         )
                       ],
                     ),

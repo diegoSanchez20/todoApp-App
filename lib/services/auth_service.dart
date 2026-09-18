@@ -54,7 +54,7 @@ class AuthService{
 
     final response = await http.post(url, headers: headers, body: body);
 
-    if(response.statusCode == 200 || response.statusCode == 201){
+    if(response.statusCode == 201){
       final responseData = jsonDecode(response.body);
       return RegisterResponse.fromJson(responseData);
     }else{

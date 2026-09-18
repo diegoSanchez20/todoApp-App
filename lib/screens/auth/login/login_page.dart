@@ -73,7 +73,7 @@ class LoginPage extends StatelessWidget {
                         ),
                         GestureDetector(
                           onTap: () => Get.toNamed('register'),
-                          child: Text('¿No tienes usuario? Haz clic aquí'),
+                          child: Text('¿No tienes un usuario? Haz clic aquí'),
                         )
                       ],
                     ),

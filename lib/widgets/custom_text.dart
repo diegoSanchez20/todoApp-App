@@ -15,7 +15,7 @@ class CustomText extends StatelessWidget {
   const CustomText({
     super.key, 
     this.obscureText = false,  
-    this.maxLength = 150, 
+    this.maxLength = 255, 
     required this.controller, 
     this.validator,
     this.usePassword = false, 
