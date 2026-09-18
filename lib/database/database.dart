@@ -2,7 +2,6 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
 import 'package:todo_app/database/tables/task_table.dart';
-import 'package:todo_app/database/tables/user_table.dart';
 
 class DatabaseService {
   static Database? _database;
@@ -17,6 +16,15 @@ class DatabaseService {
     return _database!;
   }
 
+  static Future<void> recreateTasks() async {
+    final db = await database;
+
+    await db.transaction((txn) async {
+      await TaskTable.drop(txn);
+      await TaskTable.create(txn);
+    });
+  }
+
   static Future<Database> _initDatabase() async {
     final path = join(
       await getDatabasesPath(),
@@ -27,7 +35,6 @@ class DatabaseService {
       path,
       version: 1,
       onCreate: (db, version) async {
-        await UserTable.create(db);
         await TaskTable.create(db);
       },
     );

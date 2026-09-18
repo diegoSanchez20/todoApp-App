@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:todo_app/database/database.dart';
 import 'package:todo_app/models/response/login_response.dart';
 import 'package:todo_app/services/auth_service.dart';
+import 'package:todo_app/services/cargar_data_ofline.dart';
 import 'package:todo_app/services/internet_service.dart';
 
 class LoginController extends GetxController{
@@ -35,6 +37,22 @@ class LoginController extends GetxController{
             'token': response.data.accessToken,
             'tokenType': response.data.tokenType,
           });
+
+          await DatabaseService.recreateTasks();
+
+          // INSERCION MASIVA DEL LISTADO DE TAREAS
+          final cargarDataOffline = CargarDataOfline();
+
+          final cargado = await cargarDataOffline.cargar();
+
+          if (!cargado) {
+            Get.snackbar(
+              'Error',
+              'No se pudieron cargar las tareas.',
+            );
+
+            return;
+          }
 
           Get.offNamedUntil('/task-list',(route) => false);
         }else{

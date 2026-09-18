@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:todo_app/database/operations/task_operations.dart';
 import 'package:todo_app/models/response/cerrar_sesion_response.dart';
 import 'package:todo_app/models/response/tarea_complete_response.dart';
 import 'package:todo_app/models/response/tarea_list_response.dart';
@@ -49,14 +50,6 @@ class TaskListarController extends GetxController{
   void cambiarPagina(int? number) {
     if (number == null) return;
 
-    if (!internetService.isConnected.value) {
-      Get.snackbar(
-        'Error',
-        'Sin conexión a internet.',
-      );
-      return;
-    }
-
     if (isLoading.value) return;
 
     pageNumber.value = number;
@@ -64,13 +57,6 @@ class TaskListarController extends GetxController{
   }
 
   Future<void> refreshData() async {
-    if (!internetService.isConnected.value) {
-      Get.snackbar(
-        'Error',
-        'Sin conexión a internet.',
-      );
-      return;
-    }
 
     pageNumber.value = 1;
 
@@ -81,16 +67,28 @@ class TaskListarController extends GetxController{
     if ( isLoading.value) return;
     isLoading.value = true;
 
-    if(internetService.isConnected.value){
-      TareaListResponse? response = await taskService.getAll(pageSize.value, pageNumber.value);
-      if(response != null){
+    try {
+      if(internetService.isConnected.value){
+        // Con conexión a internet
+        TareaListResponse? response = await taskService.getAll(pageSize.value, pageNumber.value);
+        if(response != null){
+          await TaskOperations.insertAll(response.data);
+          listTarea.value = response.data;
+          total.value = response.meta.total;
+        }
+      }else if(!internetService.isConnected.value){
+        // Sin conexión a internet
+        final response = await TaskOperations.getAll(page: pageNumber.value,pageSize: pageSize.value);
+        
         listTarea.value = response.data;
         total.value = response.meta.total;
       }
-    }else{
-      Get.snackbar('Error', 'Sin conexión a internet');
+    }catch(e){
+      isLoading.value = false;
+    } finally{
+      isLoading.value = false;
     }
-    isLoading.value = false;
+
   }
 
   Future<void> registrarTarea()async{

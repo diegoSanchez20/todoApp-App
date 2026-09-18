@@ -42,6 +42,7 @@ class _TaskListPageState extends State<TaskListPage> {
               : Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
+                    const NotInternetBanner(),
                     Align(
                       alignment: AlignmentGeometry.centerLeft,
                       child: GestureDetector(
