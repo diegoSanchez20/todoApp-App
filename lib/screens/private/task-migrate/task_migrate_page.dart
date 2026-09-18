@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:todo_app/models/response/tarea_list_response.dart';
 import 'package:todo_app/screens/private/task-migrate/task_migrate_controller.dart';
-import 'package:todo_app/widgets/not_internet_banner.dart';
 import 'package:todo_app/widgets/widgets.dart';
 
 class TaskMigratePage extends StatefulWidget {
@@ -56,6 +55,7 @@ class _TaskMigratePageState extends State<TaskMigratePage> {
                       ),
                     ),
                   ),
+                  if(con.listTarea.isNotEmpty)
                   _Pagination(con: con),
                 ],
               )
@@ -77,8 +77,6 @@ class _Pagination extends StatelessWidget {
   Widget build(BuildContext context) {
     return CustomPagination(
       onPageChange: (number){
-        // con.pageNumber.value = number!;
-        // con.getAll();
         con.cambiarPagina(number);
       }, 
       totalPage: (con.total / con.pageSize.value).ceil(), 

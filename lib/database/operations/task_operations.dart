@@ -344,4 +344,30 @@ class TaskOperations {
       return false;
     }
   }
+
+  static Future<bool> updateCompletedOffline({
+    required int id,
+    required bool completed,
+  }) async {
+    try {
+      final db = await DatabaseService.database;
+
+      final now = DateTime.now().toIso8601String();
+
+      final affectedRows = await db.update(
+        TaskTable.tableName,
+        {
+          'completed': completed ? 1 : 0,
+          'updated_at': now,
+          'pendiente_migrar': 1,
+        },
+        where: 'id = ?',
+        whereArgs: [id],
+      );
+
+      return affectedRows > 0;
+    } catch (e) {
+      return false;
+    }
+  }
 }

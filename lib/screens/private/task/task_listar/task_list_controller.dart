@@ -60,9 +60,6 @@ class TaskListarController extends GetxController{
 
       await Get.toNamed('/task-migrate');
 
-      // IMPORTANTE:
-      // No cambiar pageNumber.
-      // No ejecutar getAll().
       return;
     }
 
@@ -211,6 +208,7 @@ class TaskListarController extends GetxController{
   void cambiarEstadoTareaCompletado(int index, int id) async{
 
     if (internetService.isConnected.value) {
+      // con conexion a internet
       final responseMigrate =await TaskOperations.getAllPendientesMigrar(
         page: 1,
         pageSize: 1,
@@ -245,7 +243,18 @@ class TaskListarController extends GetxController{
       }
 
     }else{
-      Get.snackbar('Error', 'Sin conexión a internet.');
+      final tarea = listTarea[index];
+
+      // Nuevo estado
+      final nuevoEstado = !tarea.completed;
+      final actualziado = await TaskOperations.updateCompletedOffline(id:id,completed: nuevoEstado);
+
+      if(actualziado){
+        tarea.completed = nuevoEstado;
+
+        listTarea.refresh();
+        Get.snackbar('Correcto', 'Tarea ${tarea.completed ? 'completada' : 'Pendiente'}.');
+      }
     }
 
     isLoading.value = false;

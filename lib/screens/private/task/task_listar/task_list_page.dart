@@ -79,6 +79,7 @@ class _TaskListPageState extends State<TaskListPage> {
                         ),
                       ),
                     ),
+                    if(con.listTarea.isNotEmpty)
                     _Pagination(con: con),
                   ],
                 ),
