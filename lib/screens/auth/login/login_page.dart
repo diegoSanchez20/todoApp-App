@@ -42,7 +42,7 @@ class LoginPage extends StatelessWidget {
                               return 'Ingrese el email.';
                             }
                             if(!ExprexionRegular().formatoCorreo.hasMatch(value)){
-                              return 'El email o es válido';
+                              return 'El email no es válido.';
                             }
                             return null;
                           },
@@ -59,7 +59,7 @@ class LoginPage extends StatelessWidget {
                               return 'Ingrese la contraseña.';
                             }
                             if(value.length <= 8){
-                              return 'La contraseña debe tener mas de 8 caracteres';
+                              return 'La contraseña debe tener más de 8 caracteres.';
                             }
                             
                             return null;

@@ -55,8 +55,6 @@ class TaskCreateEditController extends GetxController{
         if(response != null){
           Get.back(result: true);
           Get.snackbar('Correcto', 'Tarea guardada correctamente.');
-        }else{
-          Get.snackbar('Error', 'Ocurrió un error al guardar la tarea.');
         }
 
       }else{

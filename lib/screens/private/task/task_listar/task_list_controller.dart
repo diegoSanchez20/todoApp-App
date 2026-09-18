@@ -118,8 +118,6 @@ class TaskListarController extends GetxController{
 
         listTarea.refresh();
         Get.snackbar('Correcto', 'Tarea ${tarea.completed ? 'completada' : 'Pendiente'}.');
-      }else{
-        Get.snackbar('Error', 'Ocurrió un error al actualizar la tarea.');
       }
 
     }else{
@@ -143,8 +141,6 @@ class TaskListarController extends GetxController{
         isLoading.value = false;
         clean();
         getAll();
-      }else{
-        Get.snackbar('Error', 'Ocurrió un error al eliminar la tarea.');
       }
 
     }else{

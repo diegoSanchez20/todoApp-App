@@ -66,7 +66,7 @@ class AuthService{
     final url = Uri.parse('$_url/logout');
     final response = await _client.post(url);
 
-    if (response.statusCode == 200 || response.statusCode == 201) {
+    if (response.statusCode == 200) {
       final responseData = jsonDecode(response.body);
       return CerrarSesionResponse.fromJson(responseData);
     }
