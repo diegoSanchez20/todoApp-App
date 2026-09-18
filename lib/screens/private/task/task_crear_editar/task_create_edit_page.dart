@@ -17,7 +17,7 @@ class TaskCreateEditPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Task'),
+        title: Text(con.tarea == null ? 'Crear Tareas' : 'Editar Tareas'),
       ),
       body: Column(
         children: [
