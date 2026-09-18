@@ -80,8 +80,8 @@ class TaskMigrateController extends GetxController{
           );
 
           if(actualizado){
-            listTarea.remove(item);
-            total.value--;
+            isLoading.value = false;
+            getAll();
             Get.snackbar('Correcto', 'Tarea migrada correctamente.');
           }
         }
@@ -102,8 +102,8 @@ class TaskMigrateController extends GetxController{
           );
           
           if (actualizado){
-            listTarea.remove(item);
-            total.value--;
+            isLoading.value = false;
+            getAll();
             Get.snackbar('Correcto', 'Tarea migrada correctamente.');
           }
         }

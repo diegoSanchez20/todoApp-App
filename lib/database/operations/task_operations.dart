@@ -103,6 +103,7 @@ class TaskOperations {
       '''
       SELECT COUNT(*) as total
       FROM ${TaskTable.tableName}
+      WHERE deleted = 0
       '''
     );
 
@@ -111,6 +112,8 @@ class TaskOperations {
     // Obtener registros de la página
     final result = await db.query(
       TaskTable.tableName,
+      where: 'deleted = ?',
+      whereArgs: [0],
       orderBy: 'position ASC',
       limit: pageSize,
       offset: offset,
@@ -345,6 +348,7 @@ class TaskOperations {
     }
   }
 
+  // completar tarea
   static Future<bool> updateCompletedOffline({
     required int id,
     required bool completed,
@@ -366,6 +370,44 @@ class TaskOperations {
       );
 
       return affectedRows > 0;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  // eliminar tarea
+  static Future<bool> deleteOffline({
+    required int id,
+  }) async {
+
+    try {
+
+      final db = await DatabaseService.database;
+
+      if (id < 0) {
+
+        final affectedRows = await db.delete(
+          TaskTable.tableName,
+          where: 'id = ?',
+          whereArgs: [id],
+        );
+
+        return affectedRows > 0;
+      }
+
+      final affectedRows = await db.update(
+        TaskTable.tableName,
+        {
+          'deleted': 1,
+          'pendiente_migrar': 1,
+          'updated_at': DateTime.now().toIso8601String(),
+        },
+        where: 'id = ?',
+        whereArgs: [id],
+      );
+
+      return affectedRows > 0;
+
     } catch (e) {
       return false;
     }

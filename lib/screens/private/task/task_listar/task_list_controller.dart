@@ -205,81 +205,101 @@ class TaskListarController extends GetxController{
     }
   }
 
-  void cambiarEstadoTareaCompletado(int index, int id) async{
-
-    if (internetService.isConnected.value) {
-      // con conexion a internet
-      final responseMigrate =await TaskOperations.getAllPendientesMigrar(
-        page: 1,
-        pageSize: 1,
-      );
-
-      if (responseMigrate.data.isNotEmpty) {
-        Get.snackbar(
-          'Migración pendiente',
-          'Debe migrar las tareas pendientes antes de actualizar.',
+  void cambiarEstadoTareaCompletado(int index, int id,DataTareaList item) async{
+    try {
+      
+      if (internetService.isConnected.value) {
+        // con conexion a internet
+        final responseMigrate =await TaskOperations.getAllPendientesMigrar(
+          page: 1,
+          pageSize: 1,
         );
 
-        await Get.toNamed('/task-migrate');
+        if (responseMigrate.data.isNotEmpty) {
+          Get.snackbar(
+            'Migración pendiente',
+            'Debe migrar las tareas pendientes antes de actualizar.',
+          );
 
-        return;
+          await Get.toNamed('/task-migrate');
+
+          return;
+        }
       }
-    }
 
-    if ( isLoading.value) return;
-    isLoading.value = true;
+      if ( isLoading.value) return;
+      isLoading.value = true;
 
-    if(internetService.isConnected.value){
+      if(internetService.isConnected.value){
 
-      TareaCompleteResponse? response = await taskService.completeId(id);
+        TareaCompleteResponse? response = await taskService.completeId(id);
 
-      if(response != null){
+        if(response != null){
+          isLoading.value = false;
+          await getAll();
+          Get.snackbar('Correcto', 'Tarea ${!item.completed ? 'completada' : 'Pendiente'}.');
+        }
+        isLoading.value = false;
+      }else{
         final tarea = listTarea[index];
 
-        tarea.completed = !tarea.completed;
+        // Nuevo estado
+        final nuevoEstado = !tarea.completed;
+        final actualziado = await TaskOperations.updateCompletedOffline(id:id,completed: nuevoEstado);
 
-        listTarea.refresh();
-        Get.snackbar('Correcto', 'Tarea ${tarea.completed ? 'completada' : 'Pendiente'}.');
+        if(actualziado){
+          isLoading.value = false;
+          await getAll();
+          Get.snackbar('Correcto', 'Tarea ${!tarea.completed ? 'completada' : 'Pendiente'}.');
+        }
+        isLoading.value = false;
       }
 
-    }else{
-      final tarea = listTarea[index];
-
-      // Nuevo estado
-      final nuevoEstado = !tarea.completed;
-      final actualziado = await TaskOperations.updateCompletedOffline(id:id,completed: nuevoEstado);
-
-      if(actualziado){
-        tarea.completed = nuevoEstado;
-
-        listTarea.refresh();
-        Get.snackbar('Correcto', 'Tarea ${tarea.completed ? 'completada' : 'Pendiente'}.');
-      }
+      
+    } catch (e) {
+      isLoading.value = false;
+      Get.snackbar( 'Error','Ocurrió un error, volver a intentar la acción.');
     }
-
-    isLoading.value = false;
   }
 
   void eliminarTarea(DataTareaList item) async{
+    try {
+      
+      if ( isLoading.value) return;
+      isLoading.value = true;
 
-    if ( isLoading.value) return;
-    isLoading.value = true;
+      if(internetService.isConnected.value){
+        // con conexion a internet
+        bool response = await taskService.delete(item.id);
 
-    if(internetService.isConnected.value){
+        if(response){
+          Get.snackbar('Correcto', 'Tarea eliminada correctamente.');
+          isLoading.value = false;
+          clean();
+          await getAll();
+        }else{
+          isLoading.value = false;
+          Get.snackbar( 'Error','No se pudo eliminar la tarea.');
+        }
 
-      bool response = await taskService.delete(item.id);
+      }else{
+        // sin conexion a internet
+        final response = await TaskOperations.deleteOffline( id: item.id);
 
-      if(response){
-        Get.snackbar('Correcto', 'Tarea eliminada correctamente.');
-        isLoading.value = false;
-        clean();
-        getAll();
+        if (response) {
+          isLoading.value = false;
+          await getAll();
+          Get.snackbar( 'Correcto','Tarea eliminada localmente.');
+        } else {
+          isLoading.value = false;
+          Get.snackbar( 'Error','No se pudo eliminar la tarea localmente.');
+        }
       }
 
-    }else{
-      Get.snackbar('Error', 'Sin conexión a internet.');
+      
+    } catch (e) {
+      isLoading.value = false;
+      Get.snackbar( 'Error','Ocurrió un error, volver a intentar la acción.');
     }
-
-    isLoading.value = false;
   }
 }

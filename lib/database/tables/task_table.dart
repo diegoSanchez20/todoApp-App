@@ -17,7 +17,8 @@ class TaskTable {
         created_at TEXT NOT NULL,
         updated_at TEXT NOT NULL,
         pendiente_migrar INTEGER NOT NULL DEFAULT 0,
-        position INTEGER NOT NULL
+        position INTEGER NOT NULL,
+        deleted INTEGER NOT NULL DEFAULT 0
       )
     ''');
   }

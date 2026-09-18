@@ -112,6 +112,7 @@ class _CardItem extends StatelessWidget {
               con.cambiarEstadoTareaCompletado(
                 index,
                 item.id,
+                item
               );
             },
           ),
