@@ -33,7 +33,7 @@ class RegisterPage extends StatelessWidget {
                       spacing: 10,
                       children: [
                         CustomText(
-                          controller: con.emailController,
+                          controller: con.nameController,
                           hintText: 'Ingrese sus nombres Completos',
                           label: 'Nombres Completos',
                           validator: (value) {

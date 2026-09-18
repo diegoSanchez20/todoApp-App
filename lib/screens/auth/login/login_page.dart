@@ -70,6 +70,10 @@ class LoginPage extends StatelessWidget {
                           onPressed: () => !con.isLoading.value 
                             ? con.iniciarSesion()
                             : null,
+                        ),
+                        GestureDetector(
+                          onTap: () => Get.toNamed('register'),
+                          child: Text('¿No tienes usuario? Haz clic aquí'),
                         )
                       ],
                     ),

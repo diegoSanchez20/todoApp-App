@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+import 'package:get_storage/get_storage.dart';
 import 'package:todo_app/models/response_api.dart';
 
 class InterceptorHttp extends http.BaseClient{
@@ -8,11 +9,15 @@ class InterceptorHttp extends http.BaseClient{
 
    @override
   Future<http.StreamedResponse> send(http.BaseRequest request) async{
-    final user = null;
-    if (user != null && user['token'] != null) {
-      request.headers['x-token'] = user['token'];
+    final user = GetStorage().read('user');
+    final accessToken = user is Map
+        ? user['access_token'] ?? user['token']
+        : null;
+
+    if (accessToken is String && accessToken.isNotEmpty) {
+      request.headers['Authorization'] = 'Bearer $accessToken';
     }
-    request.headers['Content-type'] = 'application/json';
+    request.headers['Content-Type'] = 'application/json';
 
     final response = await _inner.send(request);
 

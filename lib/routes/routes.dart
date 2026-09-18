@@ -8,7 +8,7 @@ import 'package:todo_app/screens/private/task/task_listar/task_list_page.dart';
 List<GetPage<dynamic>> getPages = [
   GetPage(
     name: '/', 
-    page: () => RegisterPage()
+    page: () => LoginPage()
   ),
   GetPage(
     name: '/register', 

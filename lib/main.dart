@@ -27,6 +27,7 @@ class MyApp extends StatelessWidget {
       title: 'App Tareas',
       debugShowCheckedModeBanner: false,
       getPages: getPages,
+      initialRoute: GetStorage().read('user') != null ? '/task-list' : '/',
       theme: AppTheme.lightTheme,
     );
   }

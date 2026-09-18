@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:todo_app/models/response/login_response.dart';
+import 'package:todo_app/services/auth_service.dart';
 import 'package:todo_app/services/internet_service.dart';
 
 class LoginController extends GetxController{
   BuildContext? context;
+  AuthService authService = AuthService(); 
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
@@ -17,9 +21,24 @@ class LoginController extends GetxController{
     
     isLoading.value = true;
 
-    await Future.delayed(const Duration(seconds: 3));
     if(internetService.isConnected.value){
-      Get.snackbar('Correcto', 'Con conexión a internet');
+      LoginResponse? response = await authService.login(
+        emailController.text, 
+        passwordController.text, 
+      );
+
+      if(response != null){
+        final storage = GetStorage();
+        
+        await storage.write('user', {
+          'token': response.data.accessToken,
+          'tokenType': response.data.tokenType,
+        });
+
+        Get.offNamedUntil('/task-list',(route) => false);
+      }else{
+        Get.snackbar('Error', 'Ocurrió un error al iniciar sesión.');
+      }
     }else{
       Get.snackbar('Error', 'Sin conexión a internet');
     }
