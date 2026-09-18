@@ -16,6 +16,7 @@ class TaskListarController extends GetxController{
   final isLoading = false.obs;
   var pageNumber = 1.obs;
   var pageSize = 10.obs;
+  var total = 0.obs;
 
   void initData(){
     getAll();
@@ -45,6 +46,23 @@ class TaskListarController extends GetxController{
     listTarea.value = [];
   }
 
+  void cambiarPagina(int? number) {
+    if (number == null) return;
+
+    if (!internetService.isConnected.value) {
+      Get.snackbar(
+        'Error',
+        'Sin conexión a internet.',
+      );
+      return;
+    }
+
+    if (isLoading.value) return;
+
+    pageNumber.value = number;
+    getAll();
+  }
+
   void getAll()async{
     if ( isLoading.value) return;
     isLoading.value = true;
@@ -52,7 +70,8 @@ class TaskListarController extends GetxController{
     if(internetService.isConnected.value){
       TareaListResponse? response = await taskService.getAll(pageSize.value, pageNumber.value);
       if(response != null){
-        listTarea.value = [...listTarea,...response.data];
+        listTarea.value = response.data;
+        total.value = response.meta.total;
       }
     }else{
       Get.snackbar('Error', 'Sin conexión a internet');

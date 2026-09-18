@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:todo_app/models/response/tarea_list_response.dart';
 import 'package:todo_app/screens/private/task/task_listar/task_list_controller.dart';
+import 'package:todo_app/widgets/widgets.dart';
 
 class TaskListPage extends StatefulWidget {
   TaskListPage({super.key});
@@ -39,11 +40,14 @@ class _TaskListPageState extends State<TaskListPage> {
                   child: CircularProgressIndicator(),
                 )
               : Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    GestureDetector(
-                      onTap: () => con.registrarTarea(),
-                      child: const Text('Nuevo'),
+                    Align(
+                      alignment: AlignmentGeometry.centerLeft,
+                      child: GestureDetector(
+                        onTap: () => con.registrarTarea(),
+                        child: const Text('Nuevo'),
+                      ),
                     ),
                     const SizedBox(height: 10),
                     Expanded(
@@ -61,6 +65,7 @@ class _TaskListPageState extends State<TaskListPage> {
                         },
                       ),
                     ),
+                    _Pagination(con: con),
                   ],
                 ),
         ),
@@ -114,6 +119,29 @@ class _CardItem extends StatelessWidget {
           onPressed: () => con.eliminarTarea(item),
         ),
       ],
+    );
+  }
+}
+
+class _Pagination extends StatelessWidget {
+
+  final TaskListarController con;
+
+  const _Pagination({
+    required this.con
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomPagination(
+      onPageChange: (number){
+        // con.pageNumber.value = number!;
+        // con.getAll();
+        con.cambiarPagina(number);
+      }, 
+      totalPage: (con.total / con.pageSize.value).ceil(), 
+      show: (con.total / con.pageSize.value).floor() - 1, 
+      currentPage: con.pageNumber.value
     );
   }
 }
