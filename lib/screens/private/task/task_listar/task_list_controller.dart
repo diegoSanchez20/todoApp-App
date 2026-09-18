@@ -63,7 +63,21 @@ class TaskListarController extends GetxController{
     getAll();
   }
 
-  void getAll()async{
+  Future<void> refreshData() async {
+    if (!internetService.isConnected.value) {
+      Get.snackbar(
+        'Error',
+        'Sin conexión a internet.',
+      );
+      return;
+    }
+
+    pageNumber.value = 1;
+
+    await getAll();
+  }
+
+  Future<void> getAll()async{
     if ( isLoading.value) return;
     isLoading.value = true;
 

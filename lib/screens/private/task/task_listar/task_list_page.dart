@@ -51,18 +51,22 @@ class _TaskListPageState extends State<TaskListPage> {
                     ),
                     const SizedBox(height: 10),
                     Expanded(
-                      child: ListView.separated(
-                        itemCount: con.listTarea.length,
-                        itemBuilder: (context, index) {
-                          return _CardItem(
-                            item: con.listTarea[index],
-                            con: con,
-                            index: index,
-                          );
-                        },
-                        separatorBuilder: (context, index) {
-                          return const Divider(color: Color.fromARGB(255,100,100,100));
-                        },
+                      child: RefreshIndicator(
+                        onRefresh: con.refreshData,
+                        child: ListView.separated(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          itemCount: con.listTarea.length,
+                          itemBuilder: (context, index) {
+                            return _CardItem(
+                              item: con.listTarea[index],
+                              con: con,
+                              index: index,
+                            );
+                          },
+                          separatorBuilder: (context, index) {
+                            return const Divider(color: Color.fromARGB(255,100,100,100));
+                          },
+                        ),
                       ),
                     ),
                     _Pagination(con: con),
