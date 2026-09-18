@@ -1,7 +1,12 @@
 import 'package:get/get.dart';
 import 'package:todo_app/database/operations/task_operations.dart';
+import 'package:todo_app/models/request/tarea_create_request.dart';
+import 'package:todo_app/models/request/tarea_update_request.dart';
+import 'package:todo_app/models/response/tarea_create_response.dart';
 import 'package:todo_app/models/response/tarea_list_response.dart';
+import 'package:todo_app/models/response/tarea_update_response.dart';
 import 'package:todo_app/services/internet_service.dart';
+import 'package:todo_app/services/task_service.dart';
 
 class TaskMigrateController extends GetxController{
   final isLoading = false.obs;
@@ -10,6 +15,7 @@ class TaskMigrateController extends GetxController{
   var pageSize = 10.obs;
   RxList<DataTareaList> listTarea = <DataTareaList>[].obs;
   final internetService = Get.find<InternetService>();
+  TaskService taskService = TaskService();
 
   void initData(){
     getAll();
@@ -41,6 +47,78 @@ class TaskMigrateController extends GetxController{
   }
 
   void migrarTarea(DataTareaList item)async{
+    if (isLoading.value) return;
 
+    if(!internetService.isConnected.value){
+      // sin conexion
+      Get.snackbar(
+        'Error',
+        'Usted no cuenta con conexion internet.',
+      );
+      return;
+    }
+    isLoading.value = true;
+
+    try {
+      if(item.id < 0){
+        //crear
+        TareaCreateRequest params = TareaCreateRequest(
+          title: item.title.trim(), 
+          description: item.description.trim()
+        );
+
+        TareaCreateResponse? response = await taskService.create(params);
+
+        if(response != null){
+          // ID que generó el servidor
+          final idServidor = response.data.id;
+
+          // Actualizar SQLite
+          final actualizado = await TaskOperations.marcarComoMigradaNueva(
+            idOffline: item.id,
+            idServidor: idServidor,
+          );
+
+          if(actualizado){
+            listTarea.remove(item);
+            total.value--;
+            Get.snackbar('Correcto', 'Tarea migrada correctamente.');
+          }
+        }
+      }else{
+        // actualizar
+        TareaUpdateRequest params = TareaUpdateRequest(
+          completed: item.completed,
+          title: item.title.trim(), 
+          description: item.description.trim()
+        );
+
+        TareaUpdateResponse? response = await taskService.edit(params,item.id);
+
+        if(response != null){
+          // Marcar como migrada en SQLite
+          final actualizado =await TaskOperations.marcarComoMigradaExistente(
+            id: item.id,
+          );
+          
+          if (actualizado){
+            listTarea.remove(item);
+            total.value--;
+            Get.snackbar('Correcto', 'Tarea migrada correctamente.');
+          }
+        }
+      }
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  void cambiarPagina(int? number)async {
+    if (number == null) return;
+
+    if (isLoading.value) return;
+
+    pageNumber.value = number;
+    getAll();
   }
 }

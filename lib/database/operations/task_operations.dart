@@ -300,5 +300,48 @@ class TaskOperations {
       return false;
     }
   }
+  // tarea migrada exitosamente
+  static Future<bool> marcarComoMigradaNueva({
+    required int idOffline,
+    required int idServidor,
+  }) async {
+    try {
+      final db = await DatabaseService.database;
 
+      final affectedRows = await db.update(
+        TaskTable.tableName,
+        {
+          'id': idServidor,
+          'pendiente_migrar': 0,
+        },
+        where: 'id = ?',
+        whereArgs: [idOffline],
+      );
+
+      return affectedRows > 0;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  static Future<bool> marcarComoMigradaExistente({
+    required int id,
+  }) async {
+    try {
+      final db = await DatabaseService.database;
+
+      final affectedRows = await db.update(
+        TaskTable.tableName,
+        {
+          'pendiente_migrar': 0,
+        },
+        where: 'id = ?',
+        whereArgs: [id],
+      );
+
+      return affectedRows > 0;
+    } catch (e) {
+      return false;
+    }
+  }
 }
