@@ -67,9 +67,12 @@ class AuthService{
     if(response.statusCode == 201){
       final responseData = jsonDecode(response.body);
       return RegisterResponse.fromJson(responseData);
-    }else{
-      return null;
     }
+
+    final responseError = jsonDecode(response.body);
+    final error = ErrorResponse.fromJson(responseError);
+
+    throw Exception(error.message);
   }
 
   Future<CerrarSesionResponse?> cerrarSesion() async {

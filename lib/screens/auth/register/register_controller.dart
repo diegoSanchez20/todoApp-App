@@ -18,27 +18,33 @@ class RegisterController extends GetxController{
 
   Future<void> registrar() async {
     if (!isValidForm() || isLoading.value) return;
-    
-    isLoading.value = true;
 
+    try {
+      isLoading.value = true;
 
-    if(internetService.isConnected.value){
-      RegisterResponse? response = await authService.register(
-        emailController.text, 
-        passwordController.text, 
-        nameController.text
-      );
+      if(internetService.isConnected.value){
+        RegisterResponse? response = await authService.register(
+          emailController.text, 
+          passwordController.text, 
+          nameController.text
+        );
 
-      if(response != null){
-        Get.snackbar('Correcto', 'El usuario se registró correctamente.');
-        Get.offNamedUntil('/',(route) => false);
+        if(response != null){
+          Get.snackbar('Correcto', 'El usuario se registró correctamente.');
+          Get.offNamedUntil('/',(route) => false);
+        }else{
+          Get.snackbar('Error', 'Ocurrió un error al registrar el usuario.');
+        }
       }else{
-        Get.snackbar('Error', 'Ocurrió un error al registrar el usuario.');
+        Get.snackbar('Error', 'Sin conexión a internet.');
       }
-    }else{
-      Get.snackbar('Error', 'Sin conexión a internet.');
+
+      isLoading.value = false;
+      
+    } catch (e) {
+      Get.snackbar('Error', e.toString().replaceFirst('Exception: ', ''),);
+      isLoading.value = false;
     }
 
-    isLoading.value = false;
   }
 }
